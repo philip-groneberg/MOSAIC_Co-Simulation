@@ -209,22 +209,18 @@ class MosaicSimulation(object):
         Accessor for mosaic actor.
         """
         vehicle = stub.GetActor(CarlaLink_pb2.ActorRequest(actor_id = actor_id))
+        
+        type_id = vehicle.type_id
+        vclass = MosaicActorClass(vehicle.vclass)
+        
+        if vehicle.color is not None:
+            color = (255, 255, 0, 100)
+        else:
+            color = vehicle.color
 
-        # type_id = vehicle.type_id
-        # vclass = MosaicActorClass(vehicle.vclass)
-        # color = vehicle.color
-
-        type_id = "vehicle.citroen.c3"
-        vclass = MosaicActorClass("passenger")
-        color = (255, 255, 0, 100) # vehicle.color
-
-        # length = vehicle.length
-        # width = vehicle.width
-        # height = vehicle.height
-
-        length = 3.975347753394775
-        width = 1.862074851989746
-        height = 1.6257729530334473
+        length = float(vehicle.length)
+        width = float(vehicle.width)
+        height = float(vehicle.height)
 
         location = list((float(vehicle.location.x), float(vehicle.location.y), float(vehicle.location.z)))
         rotation = [float(vehicle.rotation.slope), float(vehicle.rotation.angle), 0.0]
