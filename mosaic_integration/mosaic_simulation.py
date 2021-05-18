@@ -229,7 +229,7 @@ class MosaicSimulation(object):
 
         signals = vehicle.signals
         
-        extent = carla.Vector3D(int(length) / 2.0, int(width) / 2.0, int(height) / 2.0)
+        extent = carla.Vector3D(float(length) / 2.0, float(width) / 2.0, float(height) / 2.0)
 
         return MosaicActor(type_id, vclass, transform, signals, extent, color)
 

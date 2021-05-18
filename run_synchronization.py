@@ -56,6 +56,7 @@ from mosaic_integration.carla_simulation import CarlaSimulation  # pylint: disab
 from mosaic_integration.constants import INVALID_ACTOR_ID  # pylint: disable=wrong-import-position
 from mosaic_integration.mosaic_simulation import MosaicSimulation  # pylint: disable=wrong-import-position
 
+
 # ==================================================================================================
 # -- synchronization_loop --------------------------------------------------------------------------
 # ==================================================================================================
@@ -66,6 +67,7 @@ class SimulationSynchronization(object):
     SimulationSynchronization class is responsible for the synchronization of mosaic and carla
     simulations.
     """
+
     def __init__(self,
                  mosaic_simulation,
                  carla_simulation,
@@ -183,19 +185,20 @@ class SimulationSynchronization(object):
             mosaic_actor_id = self.carla2mosaic_ids[carla_actor_id]
 
             carla_actor = self.carla.get_actor(carla_actor_id)
-            mosaic_actor = self.mosaic.get_actor(mosaic_actor_id)
+            # mosaic_actor = self.mosaic.get_actor(mosaic_actor_id)
 
             mosaic_transform = BridgeHelper.get_mosaic_transform(carla_actor.get_transform(),
-                                                             carla_actor.bounding_box.extent)
-            if self.sync_vehicle_lights:
-                carla_lights = self.carla.get_actor_light_state(carla_actor_id)
-                if carla_lights is not None:
-                    mosaic_lights = BridgeHelper.get_mosaic_lights_state(mosaic_actor.signals,
-                                                                     carla_lights)
-                else:
-                    mosaic_lights = None
-            else:
-                mosaic_lights = None
+                                                                 carla_actor.bounding_box.extent)
+            # if self.sync_vehicle_lights:
+            #     carla_lights = self.carla.get_actor_light_state(carla_actor_id)
+            #     if carla_lights is not None:
+            #         mosaic_lights = BridgeHelper.get_mosaic_lights_state(mosaic_actor.signals,
+            #                                                              carla_lights)
+            #     else:
+            #         mosaic_lights = None
+            # else:
+            #     mosaic_lights = None
+            mosaic_lights = None
 
             self.mosaic.synchronize_vehicle(mosaic_actor_id, mosaic_transform, mosaic_lights)
 
@@ -232,67 +235,69 @@ class SimulationSynchronization(object):
         self.carla.close()
         self.mosaic.close()
 
+
 class CarlaLinkServiceServicer(CarlaLink_pb2_grpc.CarlaLinkServiceServicer, object):
     """Provides methods that implement functionality of route guide server."""
 
     def __init__(self, object):
-      self.sync = object
-      self.vehicles = dict()
-      self.spawned_actors = list()
-      self.destroyed_actors = list()
+        self.sync = object
+        self.vehicles = dict()
+        self.spawned_actors = list()
+        self.destroyed_actors = list()
 
     def SimulationStep(self, request, context):
-      # logging.debug("SimulationStep call recieved! Time: ", time.time())
-      step_result = self.sync.tick()
+        # logging.debug("SimulationStep call recieved! Time: ", time.time())
+        step_result = self.sync.tick()
 
-      for actor in self.destroyed_actors:
-        self.vehicles.pop(actor.id)
+        for actor in self.destroyed_actors:
+            self.vehicles.pop(actor.id)
 
-      del self.destroyed_actors[:]
-      del self.spawned_actors[:]
+        del self.destroyed_actors[:]
+        del self.spawned_actors[:]
 
-      return step_result
+        return step_result
 
     def GetActor(self, request, context):
-      # logging.debug('GetActor call recieved!')
-      return self.vehicles[request.actor_id]
+        # logging.debug('GetActor call recieved!')
+        return self.vehicles[request.actor_id]
 
     def GetDepartedIDList(self, request, context):
-      # logging.debug('GetDepartedIDList call recieved!')
-      departed_actors = CarlaLink_pb2.DepartedActors()
-      for actor in self.spawned_actors:
-        departed_actors.actors.append(actor)
-      return departed_actors
+        # logging.debug('GetDepartedIDList call recieved!')
+        departed_actors = CarlaLink_pb2.DepartedActors()
+        for actor in self.spawned_actors:
+            departed_actors.actors.append(actor)
+        return departed_actors
 
     def GetArrivedIDList(self, request, context):
-      # logging.debug('GetArrivedIDList call recieved!')
-      arrived_actors = CarlaLink_pb2.ArrivedActors()
-      for actor in self.destroyed_actors:
-        arrived_actors.actors.append(actor)
-      return arrived_actors
+        # logging.debug('GetArrivedIDList call recieved!')
+        arrived_actors = CarlaLink_pb2.ArrivedActors()
+        for actor in self.destroyed_actors:
+            arrived_actors.actors.append(actor)
+        return arrived_actors
 
     def AddVehicle(self, request, context):
-      # logging.debug('AddVehicle call recieved! id:', request.id)
-      self.spawned_actors.append(request)
-      self.vehicles.update({request.id: request})
-      return CarlaLink_pb2.Empty()
+        # logging.debug('AddVehicle call recieved! id:', request.id)
+        self.spawned_actors.append(request)
+        self.vehicles.update({request.id: request})
+        return CarlaLink_pb2.Empty()
 
     def RemoveVehicle(self, request, context):
-      # logging.debug('RemoveVehicle call recieved! id:', request.id)
-      self.destroyed_actors.append(request)
-      return CarlaLink_pb2.Empty()
+        # logging.debug('RemoveVehicle call recieved! id:', request.id)
+        self.destroyed_actors.append(request)
+        return CarlaLink_pb2.Empty()
 
     def UpdateVehicle(self, request, context):
-      # logging.debug('UpdateVehicle call recieved! id:', request.id)
-      self.vehicles.update({request.id: request})
-      return CarlaLink_pb2.Empty()
+        # logging.debug('UpdateVehicle call recieved! id:', request.id)
+        self.vehicles.update({request.id: request})
+        return CarlaLink_pb2.Empty()
+
 
 def synchronization_loop(args):
     """
     Entry point for mosaic-carla co-simulation.
     """
     mosaic_simulation = MosaicSimulation(args.mosaic_cfg_file, args.step_length, args.mosaic_host,
-                                     args.mosaic_port, args.mosaic_gui, args.client_order)
+                                         args.mosaic_port, args.mosaic_gui, args.client_order)
     carla_simulation = CarlaSimulation(args.carla_host, args.carla_port, args.step_length)
 
     synchronization = SimulationSynchronization(mosaic_simulation, carla_simulation, args.tls_manager,
