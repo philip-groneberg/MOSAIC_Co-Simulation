@@ -211,16 +211,27 @@ class MosaicSimulation(object):
         vehicle = stub.GetActor(CarlaLink_pb2.ActorRequest(actor_id = actor_id))
         
         type_id = vehicle.type_id
-        vclass = MosaicActorClass(vehicle.vclass)
+
+        if vehicle.vclass:
+            vclass = MosaicActorClass(vehicle.vclass)
+        else:
+            logging.info("get_actor: Missing vclass for '%s', using 'passenger' instead!", actor_id)
+            vclass = MosaicActorClass("passenger")
         
         if vehicle.color is not None:
             color = (255, 255, 0, 100)
         else:
             color = vehicle.color
 
-        length = float(vehicle.length)
-        width = float(vehicle.width)
-        height = float(vehicle.height)
+        if vehicle.length and vehicle.width and vehicle.height:
+            length = float(vehicle.length)
+            width = float(vehicle.width)
+            height = float(vehicle.height)
+        else:
+            logging.info("get_actor: Missing dimension for '%s' (%s,%s,%s), using base values (3.97,1.86,1.62) instead!", actor_id, vehicle.length, vehicle.width, vehicle.height)
+            length = 3.97
+            width = 1.86
+            height = 1.62
 
         location = list((float(vehicle.location.x), float(vehicle.location.y), float(vehicle.location.z)))
         rotation = [float(vehicle.rotation.slope), float(vehicle.rotation.angle), 0.0]
