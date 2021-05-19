@@ -185,19 +185,19 @@ class SimulationSynchronization(object):
             mosaic_actor_id = self.carla2mosaic_ids[carla_actor_id]
 
             carla_actor = self.carla.get_actor(carla_actor_id)
-            # mosaic_actor = self.mosaic.get_actor(mosaic_actor_id)
+            mosaic_actor = self.mosaic.get_actor(mosaic_actor_id)
 
             mosaic_transform = BridgeHelper.get_mosaic_transform(carla_actor.get_transform(),
                                                                  carla_actor.bounding_box.extent)
-            # if self.sync_vehicle_lights:
-            #     carla_lights = self.carla.get_actor_light_state(carla_actor_id)
-            #     if carla_lights is not None:
-            #         mosaic_lights = BridgeHelper.get_mosaic_lights_state(mosaic_actor.signals,
-            #                                                              carla_lights)
-            #     else:
-            #         mosaic_lights = None
-            # else:
-            #     mosaic_lights = None
+            if self.sync_vehicle_lights:
+                carla_lights = self.carla.get_actor_light_state(carla_actor_id)
+                if carla_lights is not None:
+                    mosaic_lights = BridgeHelper.get_mosaic_lights_state(mosaic_actor.signals,
+                                                                         carla_lights)
+                else:
+                    mosaic_lights = None
+            else:
+                mosaic_lights = None
             mosaic_lights = None
 
             self.mosaic.synchronize_vehicle(mosaic_actor_id, mosaic_transform, mosaic_lights)
