@@ -219,9 +219,12 @@ class MosaicSimulation(object):
             vclass = MosaicActorClass("passenger")
         
         if vehicle.color is not None:
-            color = (255, 255, 0, 100)
+            try:
+                color = list(map(int, vehicle.color.split(",")))
+            except ValueError:
+                color = (255, 255, 0, 100)
         else:
-            color = vehicle.color
+            color = (255, 255, 0, 100)
 
         if vehicle.length and vehicle.width and vehicle.height:
             length = float(vehicle.length)
