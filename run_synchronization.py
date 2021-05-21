@@ -198,7 +198,7 @@ class SimulationSynchronization(object):
                     mosaic_lights = None
             else:
                 mosaic_lights = None
-            mosaic_lights = None
+            # mosaic_lights = None
 
             self.mosaic.synchronize_vehicle(mosaic_actor_id, mosaic_transform, mosaic_lights)
 

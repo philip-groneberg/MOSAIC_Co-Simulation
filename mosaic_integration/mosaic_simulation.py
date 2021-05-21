@@ -257,7 +257,10 @@ class MosaicSimulation(object):
         """
         actor_id = 'carla' + str(self._sequential_id)
 
-        self.step_result.add_actors.append(CarlaLink_pb2.SpawnRequest(actor_id = actor_id, route = 'carla_route', type_id = type_id, color = color))
+        // TODO: use correct length, width, height
+        self.step_result.add_actors.append(CarlaLink_pb2.SpawnRequest(actor_id=actor_id, route='carla_route',
+                                                                      type_id=type_id, color=color, length=9.9,
+                                                                      width=18.1, height=12.2,))
         # add vehicle to grpc server so it can be processed by carla
         stub.AddVehicle(CarlaLink_pb2.Vehicle(id = actor_id, type_id = type_id, color = color))
         
@@ -280,10 +283,12 @@ class MosaicSimulation(object):
             :param signals: new vehicle signals.
             :return: True if successfully updated. Otherwise, False.
         """
-        loc_x, loc_y = transform.location.x, transform.location.y
-        yaw = transform.rotation.yaw
+        loc_x, loc_y, loc_z = transform.location.x, transform.location.y, transform.location.z
+        yaw, slope = transform.rotation.yaw, transform.rotation.pitch
 
-        self.step_result.move_actors.append(CarlaLink_pb2.MoveRequest(actor_id=vehicle_id, loc_x=loc_x, loc_y=loc_y, yaw=yaw, keep_route=2, signals = signals))
+        self.step_result.move_actors.append(CarlaLink_pb2.MoveRequest(actor_id=vehicle_id, loc_x=loc_x, loc_y=loc_y,
+                                                                      loc_z=loc_z, yaw=yaw, slope=slope, keep_route=2,
+                                                                      signals=signals))
         return True
 
     def get_sync_data():
