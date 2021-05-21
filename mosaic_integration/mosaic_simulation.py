@@ -257,7 +257,7 @@ class MosaicSimulation(object):
         """
         actor_id = 'carla' + str(self._sequential_id)
 
-        // TODO: use correct length, width, height
+        # TODO: use correct length, width, height
         self.step_result.add_actors.append(CarlaLink_pb2.SpawnRequest(actor_id=actor_id, route='carla_route',
                                                                       type_id=type_id, color=color, length=9.9,
                                                                       width=18.1, height=12.2,))
