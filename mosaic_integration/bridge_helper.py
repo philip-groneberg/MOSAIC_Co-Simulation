@@ -243,7 +243,7 @@ class BridgeHelper(object):
         ]) != bool(current_lights & carla.VehicleLightState.LeftBlinker)):
             current_lights ^= carla.VehicleLightState.LeftBlinker
 
-        # Break.
+        # Brake.
         if (bool(mosaic_lights & MosaicVehSignal.BRAKELIGHT) !=
                 bool(current_lights & carla.VehicleLightState.Brake)):
             current_lights ^= carla.VehicleLightState.Brake

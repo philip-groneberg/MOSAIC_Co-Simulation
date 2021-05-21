@@ -57,7 +57,7 @@ class MosaicSignalState(object):
     OFF = 'O'
 
 
-# https://mosaic.dlr.de/docs/TraCI/Vehicle_Signalling.html
+# https://sumo.dlr.de/docs/TraCI/Vehicle_Signalling.html
 class MosaicVehSignal(object):
     """
     MosaicVehSignal contains the different mosaic vehicle signals.
@@ -78,7 +78,7 @@ class MosaicVehSignal(object):
     EMERGENCY_YELLOW = 1 << 13
 
 
-# https://mosaic.dlr.de/docs/Definition_of_Vehicles,_Vehicle_Types,_and_Routes.html#abstract_vehicle_class
+# https://sumo.dlr.de/docs/Definition_of_Vehicles,_Vehicle_Types,_and_Routes.html#abstract_vehicle_class
 class MosaicActorClass(enum.Enum):
     """
     MosaicActorClass enumerates the different mosaic actor classes.
