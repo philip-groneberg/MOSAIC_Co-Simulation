@@ -169,6 +169,7 @@ class MosaicSimulation(object):
         # Structures to keep track of the spawned and destroyed vehicles at each time step.
         self.spawned_actors = set()
         self.destroyed_actors = set()
+        self.traffic_light_ids = set()
         self.step_result = CarlaLink_pb2.StepResult()
 
     @staticmethod
@@ -274,6 +275,23 @@ class MosaicSimulation(object):
         """
         self.step_result.remove_actors.append(CarlaLink_pb2.DestroyRequest(actor_id=actor_id))
 
+    def get_traffic_light_state(self, landmark_id):
+        """
+        Accessor for traffic light state.
+
+        If the traffic ligth does not exist, returns None.
+        """
+        # return self.traffic_light_manager.get_state(landmark_id)
+        traffic_light = stub.GetTrafficLight(CarlaLink_pb2.LandmarkRequest(landmark_id = landmark_id))
+        return traffic_light.state
+
+    def switch_off_traffic_lights(self):
+        """
+        Switch off all traffic lights.
+        """
+        # self.traffic_light_manager.switch_off()
+        print("TODO switch_off_traffic_lights")
+
     def synchronize_vehicle(self, vehicle_id, transform, signals=None):
         """
         Updates vehicle state.
@@ -294,25 +312,43 @@ class MosaicSimulation(object):
     def get_sync_data():
         return self.step_result
 
+    def synchronize_traffic_light(self, landmark_id, state):
+        """
+        Updates traffic light state.
+
+            :param tl_id: id of the traffic light to be updated (logic id, link index).
+            :param state: new traffic light state.
+            :return: True if successfully updated. Otherwise, False.
+        """
+        logging.debug("Mosaic sync TL: %s with state: %s", landmark_id, state)
+        self.step_result.traffic_light_updates.append(CarlaLink_pb2.TrafficLight(landmark_id = landmark_id, state = state))
+        
     def tick(self):
         """
         Tick to mosaic simulation.
         """
         self.spawned_actors.clear()
         self.destroyed_actors.clear()
+        self.traffic_light_ids.clear()
 
         del self.step_result.move_actors[:]
         del self.step_result.remove_actors[:]
         del self.step_result.add_actors[:]
+        del self.step_result.traffic_light_updates[:]
 
         departed_actors = stub.GetDepartedIDList(CarlaLink_pb2.Empty())
         arrived_actors = stub.GetArrivedIDList(CarlaLink_pb2.Empty())
+        traffic_lights = stub.GetTrafficLightIDList(CarlaLink_pb2.Empty())
 
         for actor in departed_actors.actors:
             self.spawned_actors.add(actor.id)
 
         for actor in arrived_actors.actors:
             self.destroyed_actors.add(actor.id)
+
+        for traffic_light in traffic_lights.traffic_lights:
+            self.traffic_light_ids.add(traffic_light.landmark_id)
+
 
     @staticmethod
     def close():

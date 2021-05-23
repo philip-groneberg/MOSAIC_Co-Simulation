@@ -50,6 +50,21 @@ class CarlaLinkServiceStub(object):
                 request_serializer=CarlaLink__pb2.Step.SerializeToString,
                 response_deserializer=CarlaLink__pb2.StepResult.FromString,
                 )
+        self.GetTrafficLight = channel.unary_unary(
+                '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/GetTrafficLight',
+                request_serializer=CarlaLink__pb2.LandmarkRequest.SerializeToString,
+                response_deserializer=CarlaLink__pb2.TrafficLight.FromString,
+                )
+        self.GetTrafficLightIDList = channel.unary_unary(
+                '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/GetTrafficLightIDList',
+                request_serializer=CarlaLink__pb2.Empty.SerializeToString,
+                response_deserializer=CarlaLink__pb2.TrafficLights.FromString,
+                )
+        self.UpdateTrafficLight = channel.unary_unary(
+                '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/UpdateTrafficLight',
+                request_serializer=CarlaLink__pb2.TrafficLight.SerializeToString,
+                response_deserializer=CarlaLink__pb2.Empty.FromString,
+                )
 
 
 class CarlaLinkServiceServicer(object):
@@ -98,6 +113,24 @@ class CarlaLinkServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetTrafficLight(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTrafficLightIDList(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def UpdateTrafficLight(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_CarlaLinkServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -135,6 +168,21 @@ def add_CarlaLinkServiceServicer_to_server(servicer, server):
                     servicer.SimulationStep,
                     request_deserializer=CarlaLink__pb2.Step.FromString,
                     response_serializer=CarlaLink__pb2.StepResult.SerializeToString,
+            ),
+            'GetTrafficLight': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTrafficLight,
+                    request_deserializer=CarlaLink__pb2.LandmarkRequest.FromString,
+                    response_serializer=CarlaLink__pb2.TrafficLight.SerializeToString,
+            ),
+            'GetTrafficLightIDList': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTrafficLightIDList,
+                    request_deserializer=CarlaLink__pb2.Empty.FromString,
+                    response_serializer=CarlaLink__pb2.TrafficLights.SerializeToString,
+            ),
+            'UpdateTrafficLight': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateTrafficLight,
+                    request_deserializer=CarlaLink__pb2.TrafficLight.FromString,
+                    response_serializer=CarlaLink__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -263,5 +311,56 @@ class CarlaLinkService(object):
         return grpc.experimental.unary_unary(request, target, '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/SimulationStep',
             CarlaLink__pb2.Step.SerializeToString,
             CarlaLink__pb2.StepResult.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTrafficLight(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/GetTrafficLight',
+            CarlaLink__pb2.LandmarkRequest.SerializeToString,
+            CarlaLink__pb2.TrafficLight.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTrafficLightIDList(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/GetTrafficLightIDList',
+            CarlaLink__pb2.Empty.SerializeToString,
+            CarlaLink__pb2.TrafficLights.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def UpdateTrafficLight(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/UpdateTrafficLight',
+            CarlaLink__pb2.TrafficLight.SerializeToString,
+            CarlaLink__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

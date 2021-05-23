@@ -244,6 +244,7 @@ class CarlaLinkServiceServicer(CarlaLink_pb2_grpc.CarlaLinkServiceServicer, obje
         self.vehicles = dict()
         self.spawned_actors = list()
         self.destroyed_actors = list()
+        self.traffic_lights = dict()
 
     def SimulationStep(self, request, context):
         # logging.debug("SimulationStep call recieved! Time: ", time.time())
@@ -289,6 +290,23 @@ class CarlaLinkServiceServicer(CarlaLink_pb2_grpc.CarlaLinkServiceServicer, obje
     def UpdateVehicle(self, request, context):
         # logging.debug('UpdateVehicle call recieved! id:', request.id)
         self.vehicles.update({request.id: request})
+        return CarlaLink_pb2.Empty()
+
+    def GetTrafficLight(self, request, context):
+        logging.debug('GetTrafficLight call recieved! landmark_id: %s', request.landmark_id)
+        return self.traffic_lights[request.landmark_id]
+
+    def GetTrafficLightIDList(self, request, context):
+        logging.debug('GetTrafficLightIDList call recieved!')
+        # TODO maybe change name or rework function
+        traffic_lights = CarlaLink_pb2.TrafficLights()
+        for traffic_light in self.traffic_lights:
+            traffic_lights.traffic_lights.append(traffic_light)
+        return traffic_lights
+
+    def UpdateTrafficLight(self, request, context):
+        logging.debug('UpdateTrafficLight call recieved! landmark_id:', request.landmark_id)
+        self.traffic_lights.update({request.landmark_id: request})
         return CarlaLink_pb2.Empty()
 
 
