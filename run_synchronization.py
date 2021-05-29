@@ -204,8 +204,15 @@ class SimulationSynchronization(object):
 
         # Updates traffic lights in mosaic based on carla information.
         if self.tls_manager == 'carla':
-            common_landmarks = self.mosaic.traffic_light_ids & self.carla.traffic_light_ids
+            # TODO: match traffic lights from carla and mosaic?
+            common_landmarks = self.carla.traffic_light_ids  # self.mosaic.traffic_light_ids & self.carla.traffic_light_ids
             for landmark_id in common_landmarks:
+                # Hack to get the position of a traffic light group
+                # if landmark_id in ['1618', '1619', '1620', '1621']:
+                #     tl = self.carla.get_traffic_light(landmark_id)
+                #     # print(f'LandmarkID={landmark_id}, TrafficLightID={tl.id}, Group={list(map(lambda x: x.id, tl.get_group_traffic_lights()))}')
+                #     location = self.carla.get_traffic_light(landmark_id).get_location()
+                #     # print(location.x + BridgeHelper.offset[0], location.y - BridgeHelper.offset[1])
                 carla_tl_state = self.carla.get_traffic_light_state(landmark_id)
                 mosaic_tl_state = BridgeHelper.get_mosaic_traffic_light_state(carla_tl_state)
 
