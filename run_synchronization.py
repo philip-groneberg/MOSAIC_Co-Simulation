@@ -168,9 +168,10 @@ class SimulationSynchronization(object):
             carla_actor = self.carla.get_actor(carla_actor_id)
 
             type_id = BridgeHelper.get_mosaic_vtype(carla_actor)
+            class_id = BridgeHelper.get_vehicle_class(carla_actor)
             color = carla_actor.attributes.get('color', None) if self.sync_vehicle_color else None
             if type_id is not None:
-                mosaic_actor_id = self.mosaic.spawn_actor(type_id, color)
+                mosaic_actor_id = self.mosaic.spawn_actor(type_id, class_id, color)
                 if mosaic_actor_id != INVALID_ACTOR_ID:
                     self.carla2mosaic_ids[carla_actor_id] = mosaic_actor_id
                     self.mosaic.subscribe(mosaic_actor_id)

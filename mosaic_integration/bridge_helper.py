@@ -37,6 +37,13 @@ class BridgeHelper(object):
         _VTYPES = json.load(f)['carla_blueprints']
 
     @staticmethod
+    def get_vehicle_class(carla_actor):
+        if carla_actor.type_id in BridgeHelper._VTYPES:
+            return BridgeHelper._VTYPES[carla_actor.type_id]['vClass']
+        else:
+            return "ignoring"
+
+    @staticmethod
     def get_carla_transform(in_mosaic_transform, extent):
         """
         Returns carla transform based on mosaic transform.

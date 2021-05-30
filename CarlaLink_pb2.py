@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'\n!org.eclipse.mosaic.fed.carla.grpcB\tCarlaLinkP\001',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0f\x43\x61rlaLink.proto\x12!org.eclipse.mosaic.fed.carla.grpc\"\x06\n\x04Step\"\xb0\x02\n\nStepResult\x12\x43\n\nadd_actors\x18\x01 \x03(\x0b\x32/.org.eclipse.mosaic.fed.carla.grpc.SpawnRequest\x12H\n\rremove_actors\x18\x02 \x03(\x0b\x32\x31.org.eclipse.mosaic.fed.carla.grpc.DestroyRequest\x12\x43\n\x0bmove_actors\x18\x03 \x03(\x0b\x32..org.eclipse.mosaic.fed.carla.grpc.MoveRequest\x12N\n\x15traffic_light_updates\x18\x04 \x03(\x0b\x32/.org.eclipse.mosaic.fed.carla.grpc.TrafficLight\" \n\x0c\x41\x63torRequest\x12\x10\n\x08\x61\x63tor_id\x18\x01 \x01(\t\"~\n\x0cSpawnRequest\x12\x10\n\x08\x61\x63tor_id\x18\x01 \x01(\t\x12\r\n\x05route\x18\x02 \x01(\t\x12\x0f\n\x07type_id\x18\x03 \x01(\t\x12\r\n\x05\x63olor\x18\x04 \x01(\t\x12\x0e\n\x06length\x18\x05 \x01(\x01\x12\r\n\x05width\x18\x06 \x01(\x01\x12\x0e\n\x06height\x18\x07 \x01(\x01\"\"\n\x0e\x44\x65stroyRequest\x12\x10\n\x08\x61\x63tor_id\x18\x01 \x01(\t\"\x8d\x01\n\x0bMoveRequest\x12\x10\n\x08\x61\x63tor_id\x18\x01 \x01(\t\x12\r\n\x05loc_x\x18\x02 \x01(\x01\x12\r\n\x05loc_y\x18\x03 \x01(\x01\x12\r\n\x05loc_z\x18\x04 \x01(\x01\x12\x0b\n\x03yaw\x18\x05 \x01(\x01\x12\r\n\x05slope\x18\x06 \x01(\x01\x12\x12\n\nkeep_route\x18\x07 \x01(\x05\x12\x0f\n\x07signals\x18\x08 \x01(\x05\"+\n\x08Location\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\t\n\x01z\x18\x03 \x01(\x01\"(\n\x08Rotation\x12\r\n\x05slope\x18\x01 \x01(\x01\x12\r\n\x05\x61ngle\x18\x02 \x01(\x01\"\x83\x02\n\x07Vehicle\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07type_id\x18\x02 \x01(\t\x12\x0e\n\x06vclass\x18\x03 \x01(\t\x12\r\n\x05\x63olor\x18\x04 \x01(\t\x12\x0e\n\x06length\x18\x05 \x01(\t\x12\r\n\x05width\x18\x06 \x01(\t\x12\x0e\n\x06height\x18\x07 \x01(\t\x12=\n\x08location\x18\x08 \x01(\x0b\x32+.org.eclipse.mosaic.fed.carla.grpc.Location\x12=\n\x08rotation\x18\t \x01(\x0b\x32+.org.eclipse.mosaic.fed.carla.grpc.Rotation\x12\x0f\n\x07signals\x18\n \x01(\x05\"L\n\x0e\x44\x65partedActors\x12:\n\x06\x61\x63tors\x18\x01 \x03(\x0b\x32*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\"K\n\rArrivedActors\x12:\n\x06\x61\x63tors\x18\x01 \x03(\x0b\x32*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\"\x07\n\x05\x45mpty\"&\n\x0fLandmarkRequest\x12\x13\n\x0blandmark_id\x18\x01 \x01(\t\"2\n\x0cTrafficLight\x12\x13\n\x0blandmark_id\x18\x01 \x01(\t\x12\r\n\x05state\x18\x02 \x01(\t\"X\n\rTrafficLights\x12G\n\x0etraffic_lights\x18\x01 \x03(\x0b\x32/.org.eclipse.mosaic.fed.carla.grpc.TrafficLight2\xeb\x08\n\x10\x43\x61rlaLinkService\x12i\n\x08GetActor\x12/.org.eclipse.mosaic.fed.carla.grpc.ActorRequest\x1a*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\"\x00\x12r\n\x11GetDepartedIDList\x12(.org.eclipse.mosaic.fed.carla.grpc.Empty\x1a\x31.org.eclipse.mosaic.fed.carla.grpc.DepartedActors\"\x00\x12p\n\x10GetArrivedIDList\x12(.org.eclipse.mosaic.fed.carla.grpc.Empty\x1a\x30.org.eclipse.mosaic.fed.carla.grpc.ArrivedActors\"\x00\x12\x64\n\nAddVehicle\x12*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\x1a(.org.eclipse.mosaic.fed.carla.grpc.Empty\"\x00\x12g\n\rRemoveVehicle\x12*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\x1a(.org.eclipse.mosaic.fed.carla.grpc.Empty\"\x00\x12g\n\rUpdateVehicle\x12*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\x1a(.org.eclipse.mosaic.fed.carla.grpc.Empty\"\x00\x12j\n\x0eSimulationStep\x12\'.org.eclipse.mosaic.fed.carla.grpc.Step\x1a-.org.eclipse.mosaic.fed.carla.grpc.StepResult\"\x00\x12x\n\x0fGetTrafficLight\x12\x32.org.eclipse.mosaic.fed.carla.grpc.LandmarkRequest\x1a/.org.eclipse.mosaic.fed.carla.grpc.TrafficLight\"\x00\x12u\n\x15GetTrafficLightIDList\x12(.org.eclipse.mosaic.fed.carla.grpc.Empty\x1a\x30.org.eclipse.mosaic.fed.carla.grpc.TrafficLights\"\x00\x12q\n\x12UpdateTrafficLight\x12/.org.eclipse.mosaic.fed.carla.grpc.TrafficLight\x1a(.org.eclipse.mosaic.fed.carla.grpc.Empty\"\x00\x42\x30\n!org.eclipse.mosaic.fed.carla.grpcB\tCarlaLinkP\x01\x62\x06proto3'
+  serialized_pb=b'\n\x0f\x43\x61rlaLink.proto\x12!org.eclipse.mosaic.fed.carla.grpc\"\x06\n\x04Step\"\xb0\x02\n\nStepResult\x12\x43\n\nadd_actors\x18\x01 \x03(\x0b\x32/.org.eclipse.mosaic.fed.carla.grpc.SpawnRequest\x12H\n\rremove_actors\x18\x02 \x03(\x0b\x32\x31.org.eclipse.mosaic.fed.carla.grpc.DestroyRequest\x12\x43\n\x0bmove_actors\x18\x03 \x03(\x0b\x32..org.eclipse.mosaic.fed.carla.grpc.MoveRequest\x12N\n\x15traffic_light_updates\x18\x04 \x03(\x0b\x32/.org.eclipse.mosaic.fed.carla.grpc.TrafficLight\" \n\x0c\x41\x63torRequest\x12\x10\n\x08\x61\x63tor_id\x18\x01 \x01(\t\"\x90\x01\n\x0cSpawnRequest\x12\x10\n\x08\x61\x63tor_id\x18\x01 \x01(\t\x12\r\n\x05route\x18\x02 \x01(\t\x12\x0f\n\x07type_id\x18\x03 \x01(\t\x12\x10\n\x08\x63lass_id\x18\x04 \x01(\t\x12\r\n\x05\x63olor\x18\x05 \x01(\t\x12\x0e\n\x06length\x18\x06 \x01(\x01\x12\r\n\x05width\x18\x07 \x01(\x01\x12\x0e\n\x06height\x18\x08 \x01(\x01\"\"\n\x0e\x44\x65stroyRequest\x12\x10\n\x08\x61\x63tor_id\x18\x01 \x01(\t\"\x8d\x01\n\x0bMoveRequest\x12\x10\n\x08\x61\x63tor_id\x18\x01 \x01(\t\x12\r\n\x05loc_x\x18\x02 \x01(\x01\x12\r\n\x05loc_y\x18\x03 \x01(\x01\x12\r\n\x05loc_z\x18\x04 \x01(\x01\x12\x0b\n\x03yaw\x18\x05 \x01(\x01\x12\r\n\x05slope\x18\x06 \x01(\x01\x12\x12\n\nkeep_route\x18\x07 \x01(\x05\x12\x0f\n\x07signals\x18\x08 \x01(\x05\"+\n\x08Location\x12\t\n\x01x\x18\x01 \x01(\x01\x12\t\n\x01y\x18\x02 \x01(\x01\x12\t\n\x01z\x18\x03 \x01(\x01\"(\n\x08Rotation\x12\r\n\x05slope\x18\x01 \x01(\x01\x12\r\n\x05\x61ngle\x18\x02 \x01(\x01\"\x83\x02\n\x07Vehicle\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07type_id\x18\x02 \x01(\t\x12\x0e\n\x06vclass\x18\x03 \x01(\t\x12\r\n\x05\x63olor\x18\x04 \x01(\t\x12\x0e\n\x06length\x18\x05 \x01(\t\x12\r\n\x05width\x18\x06 \x01(\t\x12\x0e\n\x06height\x18\x07 \x01(\t\x12=\n\x08location\x18\x08 \x01(\x0b\x32+.org.eclipse.mosaic.fed.carla.grpc.Location\x12=\n\x08rotation\x18\t \x01(\x0b\x32+.org.eclipse.mosaic.fed.carla.grpc.Rotation\x12\x0f\n\x07signals\x18\n \x01(\x05\"L\n\x0e\x44\x65partedActors\x12:\n\x06\x61\x63tors\x18\x01 \x03(\x0b\x32*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\"K\n\rArrivedActors\x12:\n\x06\x61\x63tors\x18\x01 \x03(\x0b\x32*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\"\x07\n\x05\x45mpty\"&\n\x0fLandmarkRequest\x12\x13\n\x0blandmark_id\x18\x01 \x01(\t\"2\n\x0cTrafficLight\x12\x13\n\x0blandmark_id\x18\x01 \x01(\t\x12\r\n\x05state\x18\x02 \x01(\t\"X\n\rTrafficLights\x12G\n\x0etraffic_lights\x18\x01 \x03(\x0b\x32/.org.eclipse.mosaic.fed.carla.grpc.TrafficLight2\xeb\x08\n\x10\x43\x61rlaLinkService\x12i\n\x08GetActor\x12/.org.eclipse.mosaic.fed.carla.grpc.ActorRequest\x1a*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\"\x00\x12r\n\x11GetDepartedIDList\x12(.org.eclipse.mosaic.fed.carla.grpc.Empty\x1a\x31.org.eclipse.mosaic.fed.carla.grpc.DepartedActors\"\x00\x12p\n\x10GetArrivedIDList\x12(.org.eclipse.mosaic.fed.carla.grpc.Empty\x1a\x30.org.eclipse.mosaic.fed.carla.grpc.ArrivedActors\"\x00\x12\x64\n\nAddVehicle\x12*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\x1a(.org.eclipse.mosaic.fed.carla.grpc.Empty\"\x00\x12g\n\rRemoveVehicle\x12*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\x1a(.org.eclipse.mosaic.fed.carla.grpc.Empty\"\x00\x12g\n\rUpdateVehicle\x12*.org.eclipse.mosaic.fed.carla.grpc.Vehicle\x1a(.org.eclipse.mosaic.fed.carla.grpc.Empty\"\x00\x12j\n\x0eSimulationStep\x12\'.org.eclipse.mosaic.fed.carla.grpc.Step\x1a-.org.eclipse.mosaic.fed.carla.grpc.StepResult\"\x00\x12x\n\x0fGetTrafficLight\x12\x32.org.eclipse.mosaic.fed.carla.grpc.LandmarkRequest\x1a/.org.eclipse.mosaic.fed.carla.grpc.TrafficLight\"\x00\x12u\n\x15GetTrafficLightIDList\x12(.org.eclipse.mosaic.fed.carla.grpc.Empty\x1a\x30.org.eclipse.mosaic.fed.carla.grpc.TrafficLights\"\x00\x12q\n\x12UpdateTrafficLight\x12/.org.eclipse.mosaic.fed.carla.grpc.TrafficLight\x1a(.org.eclipse.mosaic.fed.carla.grpc.Empty\"\x00\x42\x30\n!org.eclipse.mosaic.fed.carla.grpcB\tCarlaLinkP\x01\x62\x06proto3'
 )
 
 
@@ -165,29 +165,36 @@ _SPAWNREQUEST = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='color', full_name='org.eclipse.mosaic.fed.carla.grpc.SpawnRequest.color', index=3,
+      name='class_id', full_name='org.eclipse.mosaic.fed.carla.grpc.SpawnRequest.class_id', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='length', full_name='org.eclipse.mosaic.fed.carla.grpc.SpawnRequest.length', index=4,
-      number=5, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=float(0),
+      name='color', full_name='org.eclipse.mosaic.fed.carla.grpc.SpawnRequest.color', index=4,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='width', full_name='org.eclipse.mosaic.fed.carla.grpc.SpawnRequest.width', index=5,
+      name='length', full_name='org.eclipse.mosaic.fed.carla.grpc.SpawnRequest.length', index=5,
       number=6, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='height', full_name='org.eclipse.mosaic.fed.carla.grpc.SpawnRequest.height', index=6,
+      name='width', full_name='org.eclipse.mosaic.fed.carla.grpc.SpawnRequest.width', index=6,
       number=7, type=1, cpp_type=5, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='height', full_name='org.eclipse.mosaic.fed.carla.grpc.SpawnRequest.height', index=7,
+      number=8, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -204,8 +211,8 @@ _SPAWNREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=403,
-  serialized_end=529,
+  serialized_start=404,
+  serialized_end=548,
 )
 
 
@@ -236,8 +243,8 @@ _DESTROYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=531,
-  serialized_end=565,
+  serialized_start=550,
+  serialized_end=584,
 )
 
 
@@ -317,8 +324,8 @@ _MOVEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=568,
-  serialized_end=709,
+  serialized_start=587,
+  serialized_end=728,
 )
 
 
@@ -363,8 +370,8 @@ _LOCATION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=711,
-  serialized_end=754,
+  serialized_start=730,
+  serialized_end=773,
 )
 
 
@@ -402,8 +409,8 @@ _ROTATION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=756,
-  serialized_end=796,
+  serialized_start=775,
+  serialized_end=815,
 )
 
 
@@ -497,8 +504,8 @@ _VEHICLE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=799,
-  serialized_end=1058,
+  serialized_start=818,
+  serialized_end=1077,
 )
 
 
@@ -529,8 +536,8 @@ _DEPARTEDACTORS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1060,
-  serialized_end=1136,
+  serialized_start=1079,
+  serialized_end=1155,
 )
 
 
@@ -561,8 +568,8 @@ _ARRIVEDACTORS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1138,
-  serialized_end=1213,
+  serialized_start=1157,
+  serialized_end=1232,
 )
 
 
@@ -586,8 +593,8 @@ _EMPTY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1215,
-  serialized_end=1222,
+  serialized_start=1234,
+  serialized_end=1241,
 )
 
 
@@ -618,8 +625,8 @@ _LANDMARKREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1224,
-  serialized_end=1262,
+  serialized_start=1243,
+  serialized_end=1281,
 )
 
 
@@ -657,8 +664,8 @@ _TRAFFICLIGHT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1264,
-  serialized_end=1314,
+  serialized_start=1283,
+  serialized_end=1333,
 )
 
 
@@ -689,8 +696,8 @@ _TRAFFICLIGHTS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1316,
-  serialized_end=1404,
+  serialized_start=1335,
+  serialized_end=1423,
 )
 
 _STEPRESULT.fields_by_name['add_actors'].message_type = _SPAWNREQUEST
@@ -834,8 +841,8 @@ _CARLALINKSERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1407,
-  serialized_end=2538,
+  serialized_start=1426,
+  serialized_end=2557,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetActor',

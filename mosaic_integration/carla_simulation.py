@@ -76,6 +76,11 @@ class CarlaSimulation(object):
     def traffic_light_ids(self):
         return set(self._tls.keys())
 
+    def get_traffic_light(self, landmark_id):
+        if landmark_id not in self._tls:
+            return None
+        return self._tls[landmark_id]
+
     def get_traffic_light_state(self, landmark_id):
         """
         Accessor for traffic light state.

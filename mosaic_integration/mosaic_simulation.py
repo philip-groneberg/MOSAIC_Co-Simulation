@@ -216,7 +216,7 @@ class MosaicSimulation(object):
         if vehicle.vclass:
             vclass = MosaicActorClass(vehicle.vclass)
         else:
-            logging.info("get_actor: Missing vclass for '%s', using 'passenger' instead!", actor_id)
+            # logging.info("get_actor: Missing vclass for '%s', using 'passenger' instead!", actor_id)
             vclass = MosaicActorClass("passenger")
         
         if vehicle.color is not None:
@@ -232,7 +232,7 @@ class MosaicSimulation(object):
             width = float(vehicle.width)
             height = float(vehicle.height)
         else:
-            logging.info("get_actor: Missing dimension for '%s' (%s,%s,%s), using base values (3.97,1.86,1.62) instead!", actor_id, vehicle.length, vehicle.width, vehicle.height)
+            # logging.info("get_actor: Missing dimension for '%s' (%s,%s,%s), using base values (3.97,1.86,1.62) instead!", actor_id, vehicle.length, vehicle.width, vehicle.height)
             length = 3.97
             width = 1.86
             height = 1.62
@@ -248,20 +248,21 @@ class MosaicSimulation(object):
 
         return MosaicActor(type_id, vclass, transform, signals, extent, color)
 
-    def spawn_actor(self, type_id, color=None):
+    def spawn_actor(self, type_id, class_id, color=None):
         """
         Spawns a new actor.
 
             :param type_id: vtype to be spawned.
+            :param class_id: vehicle class to be spawned.
             :param color: color attribute for this specific actor.
             :return: actor id if the actor is successfully spawned. Otherwise, INVALID_ACTOR_ID.
         """
         actor_id = 'carla' + str(self._sequential_id)
 
-        # TODO: use correct length, width, height
+        # TODO: use correct length, width, height -> using
         self.step_result.add_actors.append(CarlaLink_pb2.SpawnRequest(actor_id=actor_id, route='carla_route',
                                                                       type_id=type_id, color=color, length=9.9,
-                                                                      width=18.1, height=12.2,))
+                                                                      width=18.1, height=12.2, class_id=class_id))
         # add vehicle to grpc server so it can be processed by carla
         stub.AddVehicle(CarlaLink_pb2.Vehicle(id = actor_id, type_id = type_id, color = color))
         
