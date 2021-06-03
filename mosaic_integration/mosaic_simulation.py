@@ -261,8 +261,8 @@ class MosaicSimulation(object):
 
         # TODO: use correct length, width, height -> using
         self.step_result.add_actors.append(CarlaLink_pb2.SpawnRequest(actor_id=actor_id, route='carla_route',
-                                                                      type_id=type_id, color=color, length=9.9,
-                                                                      width=18.1, height=12.2, class_id=class_id))
+                                                                      type_id=type_id, color=color, length=3.97,
+                                                                      width=1.86, height=1.62, class_id=class_id))
         # add vehicle to grpc server so it can be processed by carla
         stub.AddVehicle(CarlaLink_pb2.Vehicle(id = actor_id, type_id = type_id, color = color))
         

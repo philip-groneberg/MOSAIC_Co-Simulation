@@ -150,7 +150,8 @@ class SimulationSynchronization(object):
 
         # Updates traffic lights in carla based on mosaic information.
         if self.tls_manager == 'mosaic':
-            common_landmarks = self.mosaic.traffic_light_ids & self.carla.traffic_light_ids
+            # TODO: match traffic lights from carla and mosaic?
+            common_landmarks = self.mosaic.traffic_light_ids  # & self.carla.traffic_light_ids
             for landmark_id in common_landmarks:
                 mosaic_tl_state = self.mosaic.get_traffic_light_state(landmark_id)
                 carla_tl_state = BridgeHelper.get_carla_traffic_light_state(mosaic_tl_state)
@@ -306,11 +307,10 @@ class CarlaLinkServiceServicer(CarlaLink_pb2_grpc.CarlaLinkServiceServicer, obje
 
     def GetTrafficLightIDList(self, request, context):
         logging.debug('GetTrafficLightIDList call recieved!')
-        # TODO maybe change name or rework function
-        traffic_lights = CarlaLink_pb2.TrafficLights()
+        tl = CarlaLink_pb2.TrafficLights()
         for traffic_light in self.traffic_lights:
-            traffic_lights.traffic_lights.append(traffic_light)
-        return traffic_lights
+            tl.traffic_lights.append(self.traffic_lights[traffic_light])
+        return tl
 
     def UpdateTrafficLight(self, request, context):
         logging.debug('UpdateTrafficLight call recieved! landmark_id:', request.landmark_id)
