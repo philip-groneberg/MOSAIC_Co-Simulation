@@ -150,8 +150,7 @@ class SimulationSynchronization(object):
 
         # Updates traffic lights in carla based on mosaic information.
         if self.tls_manager == 'mosaic':
-            # TODO: match traffic lights from carla and mosaic?
-            common_landmarks = self.mosaic.traffic_light_ids  # & self.carla.traffic_light_ids
+            common_landmarks = self.mosaic.traffic_light_ids & self.carla.traffic_light_ids
             for landmark_id in common_landmarks:
                 mosaic_tl_state = self.mosaic.get_traffic_light_state(landmark_id)
                 carla_tl_state = BridgeHelper.get_carla_traffic_light_state(mosaic_tl_state)
