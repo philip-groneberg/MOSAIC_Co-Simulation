@@ -99,6 +99,34 @@ class SimulationSynchronization(object):
         settings.synchronous_mode = True
         settings.fixed_delta_seconds = self.carla.step_length
         self.carla.world.apply_settings(settings)
+        self.calculate_traffic_light_mapping()
+
+    def calculate_traffic_light_mapping(self):
+        """
+        Saves the carla traffic light data inside a usable file format (.json)
+        """
+        landmark_ids = self.carla.traffic_light_ids
+        sorted_ids = sorted(landmark_ids, key=lambda x: self.carla.get_traffic_light(x).get_pole_index())
+        tl_id_to_landmark_is_map = dict((self.carla.get_traffic_light(landmark_id).id, landmark_id) for landmark_id in sorted_ids)
+        
+        with open("data/traffic_light_mapping.json", "w", encoding='utf-8') as f:
+            print("{", file=f)
+            for landmark_id in sorted_ids:
+                tl = self.carla.get_traffic_light(landmark_id)
+                # break when pole_index bigger than 0 since all following traffic lights should already be calculated
+                if tl.get_pole_index() != 0:
+                    break
+                
+                print(f'"traffic-light-group": [', file=f)
+                for group_tl in tl.get_group_traffic_lights():
+                    print(f'    {{ "{group_tl.get_pole_index()}": [', file=f)
+                    print(f'        {{ "landmark_id": "{tl_id_to_landmark_is_map.get(group_tl.id)}" }},', file=f)
+                    print(f'        {{ "tl_id": "{group_tl.id}" }},', file=f)
+                    print(f'        {{ "pos_x": "{group_tl.get_location().x + BridgeHelper.offset[0]}" }},', file=f)
+                    print(f'        {{ "pos_y": "{group_tl.get_location().y - BridgeHelper.offset[1]}" }}', file=f)
+                    print(f'    ]}},', file=f)
+                print(f'],', file=f)                                    
+            print("}", file=f)
 
     def tick(self):
         """
