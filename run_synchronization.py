@@ -111,13 +111,14 @@ class SimulationSynchronization(object):
         
         with open("data/traffic_light_mapping.json", "w", encoding='utf-8') as f:
             print("{", file=f)
+            i = 0
             for landmark_id in sorted_ids:
                 tl = self.carla.get_traffic_light(landmark_id)
                 # break when pole_index bigger than 0 since all following traffic lights should already be calculated
                 if tl.get_pole_index() != 0:
                     break
                 
-                print(f'"traffic-light-group": [', file=f)
+                print(f'"traffic-light-group-{i}": [', file=f)
                 for group_tl in tl.get_group_traffic_lights():
                     print(f'    {{ "{group_tl.get_pole_index()}": [', file=f)
                     print(f'        {{ "landmark_id": "{tl_id_to_landmark_is_map.get(group_tl.id)}" }},', file=f)
@@ -125,7 +126,8 @@ class SimulationSynchronization(object):
                     print(f'        {{ "pos_x": "{group_tl.get_location().x + BridgeHelper.offset[0]}" }},', file=f)
                     print(f'        {{ "pos_y": "{group_tl.get_location().y - BridgeHelper.offset[1]}" }}', file=f)
                     print(f'    ]}},', file=f)
-                print(f'],', file=f)                                    
+                print(f'],', file=f)
+                i += 1
             print("}", file=f)
 
     def tick(self):
