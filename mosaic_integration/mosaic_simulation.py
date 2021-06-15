@@ -259,7 +259,6 @@ class MosaicSimulation(object):
         """
         actor_id = 'carla' + str(self._sequential_id)
 
-        # TODO: use correct length, width, height -> using
         self.step_result.add_actors.append(CarlaLink_pb2.SpawnRequest(actor_id=actor_id, route='carla_route',
                                                                       type_id=type_id, color=color, length=3.97,
                                                                       width=1.86, height=1.62, class_id=class_id))
@@ -291,7 +290,8 @@ class MosaicSimulation(object):
         Switch off all traffic lights.
         """
         # self.traffic_light_manager.switch_off()
-        print("TODO switch_off_traffic_lights")
+        # maybe switch off traffic lights in Mosaic (if possible)
+        return
 
     def synchronize_vehicle(self, vehicle_id, transform, signals=None):
         """
