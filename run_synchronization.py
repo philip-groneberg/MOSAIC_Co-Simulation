@@ -39,6 +39,8 @@ try:
 except IndexError:
     pass
 
+import carla  # pylint: disable=import-error
+
 # ==================================================================================================
 # -- find traci module -----------------------------------------------------------------------------
 # ==================================================================================================
@@ -102,7 +104,7 @@ class SimulationSynchronization(object):
         self.carla.world.apply_settings(settings)
         self.calculate_traffic_light_mapping()
 
-        self.sensor = None
+        self.sensors = dict()
 
     def calculate_traffic_light_mapping(self):
         """
@@ -133,46 +135,39 @@ class SimulationSynchronization(object):
                 i += 1
             print("}", file=f)
 
-    def process_lidar(self, data):
-        """
-        Transfer of LIDAR sensor data to Mosaic
-        :param data: LIDAR data
-        :return:
-        """
-        # print(data.horizontal_angle, data.channels, data.timestamp, data.transform)
+    def spawn_sensor(self, sensor):
+        if sensor.type_id == 'LiDAR':
+            lidar_bp = self.carla.world.get_blueprint_library().find('sensor.lidar.ray_cast')
+            lidar_bp.set_attribute('range', '100')
+            lidar_bp.set_attribute('dropoff_general_rate', lidar_bp.get_attribute('dropoff_general_rate').recommended_values[0])
+            lidar_bp.set_attribute('dropoff_intensity_limit', lidar_bp.get_attribute('dropoff_intensity_limit').recommended_values[0])
+            lidar_bp.set_attribute('dropoff_zero_intensity', lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0])
 
-        # code taken from lidar_to_camera.py example by Carla
-        # Get the lidar data and convert it to a numpy array.
-        p_cloud_size = len(data)
-        p_cloud = np.copy(np.frombuffer(data.raw_data, dtype=np.dtype('f4')))
-        p_cloud = np.reshape(p_cloud, (p_cloud_size, 4))
+            # TODO make dynamic for all attributes
+            # for key in sensor_options:
+            #     lidar_bp.set_attribute(key, sensor_options[key])
 
-        # Lidar intensity array of shape (p_cloud_size,) but, for now, let's
-        # focus on the 3D points.
-        intensity = np.array(p_cloud[:, 3])
+            # location = list((float(sensor.location.x), float(sensor.location.y), float(sensor.location.z)))
+            # rotation = [float(sensor.rotation.slope), float(sensor.rotation.angle), 0.0]
+            # transform = carla.Transform(carla.Location(location[0], location[1], location[2]),
+            #                             carla.Rotation(rotation[0], rotation[1], rotation[2]))
 
-        # Point cloud in lidar sensor space array of shape (3, p_cloud_size).
-        local_lidar_points = np.array(p_cloud[:, :3]).T
+            transform = carla.Transform(carla.Location(0, 0, 2.4), carla.Rotation(0, 0, 0)) # TODO
 
-        # Add an extra 1.0 at the end of each 3d point so it becomes of
-        # shape (4, p_cloud_size) and it can be multiplied by a (4, 4) matrix.
-        local_lidar_points = np.r_[local_lidar_points, [np.ones(local_lidar_points.shape[1])]]
 
-        # This (4, 4) matrix transforms the points from lidar space to world space.
-        lidar_2_world = self.sensor.get_transform().get_matrix()
-        # Transform the points from lidar space to world space.
-        world_points = np.dot(lidar_2_world, local_lidar_points)
+            to_attach = self.carla.get_actor(int(sensor.attached))
+            # to_attach = self.mosaic.get_actor(sensor.attached)
 
-        # apply offset to Mosaic
-        offset = [[BridgeHelper.offset[0]], [-BridgeHelper.offset[1]], [0], [0]]
-        world_points_with_offset = world_points + offset
-        # mirror y axis
-        world_points_with_offset *= [[1], [-1], [1], [1]]
-        # lose unnecessary 4th row
-        world_points_with_offset = world_points_with_offset[:3, :]
+            lidar = self.carla.world.spawn_actor(lidar_bp, transform, attach_to=to_attach)
 
-        print('Shape of LIDAR points:', world_points_with_offset)
-        print('Shape of intensity:', intensity.shape)
+            lidar.listen(lambda event: self.mosaic.process_lidar(event))
+
+            self.sensors.update({sensor.id: lidar}) # TODO change to lidar id
+
+            # TODO replace with generated sensor data
+            return sensor
+        else:
+            return None
 
     def tick(self):
         """
@@ -182,15 +177,6 @@ class SimulationSynchronization(object):
         # mosaic-->carla sync
         # -----------------
         self.mosaic.tick()
-
-        # look for sensors
-        if self.sensor is None:
-            w = self.carla.world.get_actors()
-            for actor in w:
-                if actor.type_id == 'sensor.lidar.ray_cast':
-                    self.sensor = actor
-                    actor.listen(lambda event: self.process_lidar(event))
-                    break
 
         # Spawning new mosaic actors in carla (i.e, not controlled by carla).
         mosaic_spawned_actors = self.mosaic.spawned_actors - set(self.carla2mosaic_ids.values())
@@ -383,19 +369,33 @@ class CarlaLinkServiceServicer(CarlaLink_pb2_grpc.CarlaLinkServiceServicer, obje
         return CarlaLink_pb2.Empty()
 
     def GetTrafficLight(self, request, context):
-        logging.debug('GetTrafficLight call recieved! landmark_id: %s', request.landmark_id)
+        # logging.debug('GetTrafficLight call recieved! landmark_id: %s', request.landmark_id)
         return self.traffic_lights[request.landmark_id]
 
     def GetTrafficLightIDList(self, request, context):
-        logging.debug('GetTrafficLightIDList call recieved!')
+        # logging.debug('GetTrafficLightIDList call recieved!')
         tl = CarlaLink_pb2.TrafficLights()
         for traffic_light in self.traffic_lights:
             tl.traffic_lights.append(self.traffic_lights[traffic_light])
         return tl
 
     def UpdateTrafficLight(self, request, context):
-        logging.debug('UpdateTrafficLight call recieved! landmark_id:', request.landmark_id)
+        # logging.debug('UpdateTrafficLight call recieved! landmark_id:', request.landmark_id)
         self.traffic_lights.update({request.landmark_id: request})
+        return CarlaLink_pb2.Empty()
+
+    def AddSensor(self, request, context):
+        logging.debug('AddSensor call recieved! ')#, request)
+        new_sensor = self.sync.spawn_sensor(request)
+        # self.sensors.update({new_sensor.id: new_sensor})
+        # logging.debug('AddSensor: Sensor added with:', new_sensor)
+        return new_sensor
+
+    def RemoveSensor(self, request, context):
+        logging.debug('RemoveSensor call recieved! id:', request.id)
+        # sensor.stop()
+        # self.sensor.destroy()
+        self.sensors.pop(request.id)
         return CarlaLink_pb2.Empty()
 
 

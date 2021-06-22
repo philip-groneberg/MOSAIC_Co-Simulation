@@ -65,6 +65,16 @@ class CarlaLinkServiceStub(object):
                 request_serializer=CarlaLink__pb2.TrafficLight.SerializeToString,
                 response_deserializer=CarlaLink__pb2.Empty.FromString,
                 )
+        self.AddSensor = channel.unary_unary(
+                '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/AddSensor',
+                request_serializer=CarlaLink__pb2.Sensor.SerializeToString,
+                response_deserializer=CarlaLink__pb2.Sensor.FromString,
+                )
+        self.RemoveSensor = channel.unary_unary(
+                '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/RemoveSensor',
+                request_serializer=CarlaLink__pb2.Sensor.SerializeToString,
+                response_deserializer=CarlaLink__pb2.Empty.FromString,
+                )
 
 
 class CarlaLinkServiceServicer(object):
@@ -131,6 +141,18 @@ class CarlaLinkServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def AddSensor(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def RemoveSensor(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_CarlaLinkServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -182,6 +204,16 @@ def add_CarlaLinkServiceServicer_to_server(servicer, server):
             'UpdateTrafficLight': grpc.unary_unary_rpc_method_handler(
                     servicer.UpdateTrafficLight,
                     request_deserializer=CarlaLink__pb2.TrafficLight.FromString,
+                    response_serializer=CarlaLink__pb2.Empty.SerializeToString,
+            ),
+            'AddSensor': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddSensor,
+                    request_deserializer=CarlaLink__pb2.Sensor.FromString,
+                    response_serializer=CarlaLink__pb2.Sensor.SerializeToString,
+            ),
+            'RemoveSensor': grpc.unary_unary_rpc_method_handler(
+                    servicer.RemoveSensor,
+                    request_deserializer=CarlaLink__pb2.Sensor.FromString,
                     response_serializer=CarlaLink__pb2.Empty.SerializeToString,
             ),
     }
@@ -361,6 +393,40 @@ class CarlaLinkService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/UpdateTrafficLight',
             CarlaLink__pb2.TrafficLight.SerializeToString,
+            CarlaLink__pb2.Empty.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def AddSensor(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/AddSensor',
+            CarlaLink__pb2.Sensor.SerializeToString,
+            CarlaLink__pb2.Sensor.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def RemoveSensor(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/org.eclipse.mosaic.fed.carla.grpc.CarlaLinkService/RemoveSensor',
+            CarlaLink__pb2.Sensor.SerializeToString,
             CarlaLink__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

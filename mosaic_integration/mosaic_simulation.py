@@ -15,6 +15,7 @@ import collections
 import enum
 import logging
 import os
+import numpy as np
 
 import carla  # pylint: disable=import-error
 
@@ -321,8 +322,63 @@ class MosaicSimulation(object):
             :param state: new traffic light state.
             :return: True if successfully updated. Otherwise, False.
         """
-        logging.debug("Mosaic sync TL: %s with state: %s", landmark_id, state)
+        # logging.debug("Mosaic sync TL: %s with state: %s", landmark_id, state)
         self.step_result.traffic_light_updates.append(CarlaLink_pb2.TrafficLight(landmark_id = landmark_id, state = state))
+
+    def process_lidar(self, data):
+        """
+        Transfer of LIDAR sensor data to Mosaic
+        :param data: LIDAR data
+        :return:
+        """
+        # print(data, data.horizontal_angle, data.channels, data.timestamp, data.transform)
+
+        # code taken from lidar_to_camera.py example by Carla
+        # Get the lidar data and convert it to a numpy array.
+        p_cloud_size = len(data)
+        p_cloud = np.copy(np.frombuffer(data.raw_data, dtype=np.dtype('f4')))
+        p_cloud = np.reshape(p_cloud, (p_cloud_size, 4))
+
+        # Lidar intensity array of shape (p_cloud_size,) but, for now, let's
+        # focus on the 3D points.
+        intensity = np.array(p_cloud[:, 3])
+
+        # Point cloud in lidar sensor space array of shape (3, p_cloud_size).
+        local_lidar_points = np.array(p_cloud[:, :3]).T
+
+        # Add an extra 1.0 at the end of each 3d point so it becomes of
+        # shape (4, p_cloud_size) and it can be multiplied by a (4, 4) matrix.
+        local_lidar_points = np.r_[local_lidar_points, [np.ones(local_lidar_points.shape[1])]]
+
+        # This (4, 4) matrix transforms the points from lidar space to world space.
+        # lidar_2_world = self.sensor.get_transform().get_matrix()
+        lidar_2_world = data.transform.get_matrix()
+        # Transform the points from lidar space to world space.
+        world_points = np.dot(lidar_2_world, local_lidar_points)
+
+        # apply offset to Mosaic
+        # offset = [[BridgeHelper.offset[0]], [-BridgeHelper.offset[1]], [0], [0]]
+        offset = [[self.get_net_offset()[0]], [-self.get_net_offset()[1]], [0], [0]]
+        world_points_with_offset = world_points + offset
+        # mirror y axis
+        world_points_with_offset *= [[1], [-1], [1], [1]]
+        # lose unnecessary 4th row
+        world_points_with_offset = world_points_with_offset[:3, :]
+
+        print('Shape of LIDAR points:', world_points_with_offset.shape)
+        print('Shape of intensity:', intensity.shape)
+
+        sensor_location = CarlaLink_pb2.Location(x = float(data.transform.location.x), y = float(data.transform.location.y), z = float(data.transform.location.z))
+        sensor_data = CarlaLink_pb2.SensorData(id = "filler_WIP", timestamp = str(data.timestamp), minRange = 0, maxRange = 0, location = sensor_location)
+
+        for i, intensity_value in enumerate(intensity):
+            # print('Intensity:', intensity_value)
+            if intensity_value > 0:
+                lidar_point = CarlaLink_pb2.Location(x = float(world_points_with_offset[0][i]), y = float(world_points_with_offset[1][i]), z = float(world_points_with_offset[2][i]))
+                # print('Recorded LIDAR point:', lidar_point)
+                sensor_data.lidar_points.append(lidar_point)
+
+        self.step_result.sensor_data.append(sensor_data)
         
     def tick(self):
         """
@@ -336,6 +392,7 @@ class MosaicSimulation(object):
         del self.step_result.remove_actors[:]
         del self.step_result.add_actors[:]
         del self.step_result.traffic_light_updates[:]
+        del self.step_result.sensor_data[:]
 
         departed_actors = stub.GetDepartedIDList(CarlaLink_pb2.Empty())
         arrived_actors = stub.GetArrivedIDList(CarlaLink_pb2.Empty())
