@@ -158,13 +158,13 @@ class MosaicSimulation(object):
             stub = CarlaLink_pb2_grpc.CarlaLinkServiceStub(channel)
 
         else:
-            logging.info('Connection to grpx server. Host: %s Port: %s', host, port)
+            logging.info('Connection to grpc server. Host: %s Port: %s', host, port)
             stub = CarlaLink_pb2_grpc.CarlaLinkServiceStub(host + ":" + port)
 
         # Retrieving net from configuration file.
         self.net = _get_mosaic_net(cfg_file)
 
-        # Variable to asign an id to new added actors.
+        # Variable to assign an id to new added actors.
         self._sequential_id = 0
 
         # Structures to keep track of the spawned and destroyed vehicles at each time step.
@@ -280,7 +280,7 @@ class MosaicSimulation(object):
         """
         Accessor for traffic light state.
 
-        If the traffic ligth does not exist, returns None.
+        If the traffic light does not exist, returns None.
         """
         # return self.traffic_light_manager.get_state(landmark_id)
         traffic_light = stub.GetTrafficLight(CarlaLink_pb2.LandmarkRequest(landmark_id = landmark_id))
@@ -325,13 +325,17 @@ class MosaicSimulation(object):
         # logging.debug("Mosaic sync TL: %s with state: %s", landmark_id, state)
         self.step_result.traffic_light_updates.append(CarlaLink_pb2.TrafficLight(landmark_id = landmark_id, state = state))
 
-    def process_lidar(self, data):
+    def process_lidar(self, data, sensor_id):
         """
         Transfer of LIDAR sensor data to Mosaic
         :param data: LIDAR data
+        :param sensor_id: ID of the vehicle the sensor is attached to
         :return:
         """
         # print(data, data.horizontal_angle, data.channels, data.timestamp, data.transform)
+
+        # TODO: okay to delete here?
+        del self.step_result.sensor_data[:]
 
         # code taken from lidar_to_camera.py example by Carla
         # Get the lidar data and convert it to a numpy array.
@@ -365,11 +369,10 @@ class MosaicSimulation(object):
         # lose unnecessary 4th row
         world_points_with_offset = world_points_with_offset[:3, :]
 
-        print('Shape of LIDAR points:', world_points_with_offset.shape)
-        print('Shape of intensity:', intensity.shape)
+        # print('LiDAR position:', data.transform.location)
 
         sensor_location = CarlaLink_pb2.Location(x = float(data.transform.location.x), y = float(data.transform.location.y), z = float(data.transform.location.z))
-        sensor_data = CarlaLink_pb2.SensorData(id = "filler_WIP", timestamp = str(data.timestamp), minRange = 0, maxRange = 0, location = sensor_location)
+        sensor_data = CarlaLink_pb2.SensorData(id = sensor_id, timestamp = str(data.timestamp), minRange = 0, maxRange = 300, location = sensor_location)
 
         for i, intensity_value in enumerate(intensity):
             # print('Intensity:', intensity_value)
@@ -379,7 +382,7 @@ class MosaicSimulation(object):
                 sensor_data.lidar_points.append(lidar_point)
 
         self.step_result.sensor_data.append(sensor_data)
-        
+
     def tick(self):
         """
         Tick to mosaic simulation.
@@ -392,7 +395,6 @@ class MosaicSimulation(object):
         del self.step_result.remove_actors[:]
         del self.step_result.add_actors[:]
         del self.step_result.traffic_light_updates[:]
-        del self.step_result.sensor_data[:]
 
         departed_actors = stub.GetDepartedIDList(CarlaLink_pb2.Empty())
         arrived_actors = stub.GetArrivedIDList(CarlaLink_pb2.Empty())

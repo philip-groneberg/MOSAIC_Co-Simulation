@@ -15,7 +15,6 @@ Script to integrate CARLA and Eclipse-MOSAIC simulations
 
 import argparse
 import logging
-import time
 
 from concurrent import futures
 import grpc
@@ -29,7 +28,6 @@ import CarlaLink_pb2_grpc
 import glob
 import os
 import sys
-import numpy as np
 
 try:
     sys.path.append(
@@ -154,17 +152,18 @@ class SimulationSynchronization(object):
 
             transform = carla.Transform(carla.Location(0, 0, 2.4), carla.Rotation(0, 0, 0)) # TODO
 
-
-            to_attach = self.carla.get_actor(int(sensor.attached))
+            to_attach = self.carla.get_actor(self.mosaic2carla_ids[sensor.id])
             # to_attach = self.mosaic.get_actor(sensor.attached)
 
             lidar = self.carla.world.spawn_actor(lidar_bp, transform, attach_to=to_attach)
 
-            lidar.listen(lambda event: self.mosaic.process_lidar(event))
+            lidar.listen(lambda event: self.mosaic.process_lidar(event, str(lidar.id)))
 
             self.sensors.update({sensor.id: lidar}) # TODO change to lidar id
 
-            # TODO replace with generated sensor data
+            attribute = CarlaLink_pb2.Attribute(name='sensor_id', value=str(lidar.id))
+            sensor.attributes.append(attribute)
+            # TODO done? (replace with generated sensor data)
             return sensor
         else:
             return None
@@ -262,8 +261,7 @@ class SimulationSynchronization(object):
             if self.sync_vehicle_lights:
                 carla_lights = self.carla.get_actor_light_state(carla_actor_id)
                 if carla_lights is not None:
-                    mosaic_lights = BridgeHelper.get_mosaic_lights_state(mosaic_actor.signals,
-                                                                         carla_lights)
+                    mosaic_lights = BridgeHelper.get_mosaic_lights_state(mosaic_actor.signals, carla_lights)
                 else:
                     mosaic_lights = None
             else:
@@ -276,12 +274,6 @@ class SimulationSynchronization(object):
             # send all traffic light; non-existing traffic lights on Mosaic side will be ignored
             common_landmarks = self.carla.traffic_light_ids
             for landmark_id in common_landmarks:
-                # Hack to get the position of a traffic light group
-                # if landmark_id in ['1618', '1619', '1620', '1621']:
-                #     tl = self.carla.get_traffic_light(landmark_id)
-                #     # print(f'LandmarkID={landmark_id}, TrafficLightID={tl.id}, Group={list(map(lambda x: x.id, tl.get_group_traffic_lights()))}')
-                #     location = self.carla.get_traffic_light(landmark_id).get_location()
-                #     # print(location.x + BridgeHelper.offset[0], location.y - BridgeHelper.offset[1])
                 carla_tl_state = self.carla.get_traffic_light_state(landmark_id)
                 mosaic_tl_state = BridgeHelper.get_mosaic_traffic_light_state(carla_tl_state)
 
@@ -416,7 +408,7 @@ def synchronization_loop(args):
             CarlaLinkServiceServicer(synchronization), server)
         server.add_insecure_port('[::]:50051')
         server.start()
-        logging.info('Waiting for incomming calls...')
+        logging.info('Waiting for incoming calls...')
         server.wait_for_termination()
 
     except KeyboardInterrupt:
