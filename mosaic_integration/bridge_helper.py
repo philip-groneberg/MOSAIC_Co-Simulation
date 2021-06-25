@@ -126,7 +126,7 @@ class BridgeHelper(object):
 
         if type_id in [bp.id for bp in blueprint_library]:
             blueprint = blueprint_library.filter(type_id)[0]
-            logging.debug('[BridgeHelper] mosaic vtype %s found in carla blueprints', type_id)
+            # logging.debug('[BridgeHelper] mosaic vtype %s found in carla blueprints', type_id)
         else:
             blueprint = BridgeHelper._get_recommended_carla_blueprint(mosaic_actor)
             if blueprint is not None:
@@ -152,11 +152,11 @@ class BridgeHelper(object):
 
         blueprint.set_attribute('role_name', 'mosaic_driver')
 
-        logging.debug(
-            '''[BridgeHelper] mosaic vtype %s will be spawned in carla with the following attributes:
-            \tblueprint: %s
-            \tcolor: %s''', type_id, blueprint.id,
-            mosaic_actor.color if blueprint.has_attribute('color') else (-1, -1, -1))
+        # logging.debug(
+        #     '''[BridgeHelper] mosaic vtype %s will be spawned in carla with the following attributes:
+        #     \tblueprint: %s
+        #     \tcolor: %s''', type_id, blueprint.id,
+        #     mosaic_actor.color if blueprint.has_attribute('color') else (-1, -1, -1))
 
         return blueprint
 

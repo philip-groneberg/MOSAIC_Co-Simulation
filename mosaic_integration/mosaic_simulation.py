@@ -327,15 +327,13 @@ class MosaicSimulation(object):
 
     def process_lidar(self, data, sensor_id):
         """
-        Transfer of LIDAR sensor data to Mosaic
+        Transfer of LIDAR sensor data to the stepResult that get transferred to Mosaic
         :param data: LIDAR data
         :param sensor_id: ID of the vehicle the sensor is attached to
         :return:
         """
-        # print(data, data.horizontal_angle, data.channels, data.timestamp, data.transform)
 
-        # TODO: okay to delete here?
-        del self.step_result.sensor_data[:]
+        print("Create sensor data for sensor:", sensor_id, " at ", str(data.timestamp))
 
         # code taken from lidar_to_camera.py example by Carla
         # Get the lidar data and convert it to a numpy array.
@@ -361,15 +359,12 @@ class MosaicSimulation(object):
         world_points = np.dot(lidar_2_world, local_lidar_points)
 
         # apply offset to Mosaic
-        # offset = [[BridgeHelper.offset[0]], [-BridgeHelper.offset[1]], [0], [0]]
         offset = [[self.get_net_offset()[0]], [-self.get_net_offset()[1]], [0], [0]]
         world_points_with_offset = world_points + offset
         # mirror y axis
         world_points_with_offset *= [[1], [-1], [1], [1]]
         # lose unnecessary 4th row
         world_points_with_offset = world_points_with_offset[:3, :]
-
-        # print('LiDAR position:', data.transform.location)
 
         sensor_location = CarlaLink_pb2.Location(x = float(data.transform.location.x), y = float(data.transform.location.y), z = float(data.transform.location.z))
         sensor_data = CarlaLink_pb2.SensorData(id = sensor_id, timestamp = str(data.timestamp), minRange = 0, maxRange = 300, location = sensor_location)
@@ -387,6 +382,7 @@ class MosaicSimulation(object):
         """
         Tick to mosaic simulation.
         """
+        print("mosaic tick called!")
         self.spawned_actors.clear()
         self.destroyed_actors.clear()
         self.traffic_light_ids.clear()
@@ -395,6 +391,7 @@ class MosaicSimulation(object):
         del self.step_result.remove_actors[:]
         del self.step_result.add_actors[:]
         del self.step_result.traffic_light_updates[:]
+        del self.step_result.sensor_data[:]
 
         departed_actors = stub.GetDepartedIDList(CarlaLink_pb2.Empty())
         arrived_actors = stub.GetArrivedIDList(CarlaLink_pb2.Empty())

@@ -136,10 +136,22 @@ class SimulationSynchronization(object):
     def spawn_sensor(self, sensor):
         if sensor.type_id == 'LiDAR':
             lidar_bp = self.carla.world.get_blueprint_library().find('sensor.lidar.ray_cast')
+            
             lidar_bp.set_attribute('range', '100')
+            range_attribute = CarlaLink_pb2.Attribute(name='range', value='100')
+            sensor.attributes.append(range_attribute)
+
             lidar_bp.set_attribute('dropoff_general_rate', lidar_bp.get_attribute('dropoff_general_rate').recommended_values[0])
+            dropoff_general_rate_attribute = CarlaLink_pb2.Attribute(name='dropoff_general_rate', value=str(lidar_bp.get_attribute('dropoff_general_rate').recommended_values[0]))
+            sensor.attributes.append(dropoff_general_rate_attribute)
+
             lidar_bp.set_attribute('dropoff_intensity_limit', lidar_bp.get_attribute('dropoff_intensity_limit').recommended_values[0])
+            dropoff_intensity_limit_attribute = CarlaLink_pb2.Attribute(name='dropoff_intensity_limit', value=str(lidar_bp.get_attribute('dropoff_intensity_limit').recommended_values[0]))
+            sensor.attributes.append(dropoff_intensity_limit_attribute)
+
             lidar_bp.set_attribute('dropoff_zero_intensity', lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0])
+            dropoff_zero_intensity_attribute = CarlaLink_pb2.Attribute(name='dropoff_zero_intensity', value=str(lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0]))
+            sensor.attributes.append(range_attribute)
 
             # TODO make dynamic for all attributes
             # for key in sensor_options:
@@ -152,18 +164,20 @@ class SimulationSynchronization(object):
 
             transform = carla.Transform(carla.Location(0, 0, 2.4), carla.Rotation(0, 0, 0)) # TODO
 
-            to_attach = self.carla.get_actor(self.mosaic2carla_ids[sensor.id])
+            # TODO check if id exists inside mosaic2carla_ids. If not try with direct carla_id to support carla sensor spawn
+            to_attach = self.carla.get_actor(self.mosaic2carla_ids[sensor.attached])
+            # to_attach = self.carla.get_actor(int(sensor.attached))
             # to_attach = self.mosaic.get_actor(sensor.attached)
 
             lidar = self.carla.world.spawn_actor(lidar_bp, transform, attach_to=to_attach)
 
             lidar.listen(lambda event: self.mosaic.process_lidar(event, str(lidar.id)))
 
-            self.sensors.update({sensor.id: lidar}) # TODO change to lidar id
+            self.sensors.update({lidar.id: lidar})
 
-            attribute = CarlaLink_pb2.Attribute(name='sensor_id', value=str(lidar.id))
-            sensor.attributes.append(attribute)
-            # TODO done? (replace with generated sensor data)
+            sensor.id = str(lidar.id)
+
+            print(sensor)
             return sensor
         else:
             return None
@@ -298,6 +312,11 @@ class SimulationSynchronization(object):
 
         for mosaic_actor_id in self.carla2mosaic_ids.values():
             self.mosaic.destroy_actor(mosaic_actor_id)
+
+        # Destroy still existing sensors.
+        for existing_sensor in self.sensors.values():
+            if existing_sensor is not None:
+                existing_sensor.destroy()
 
         # Closing mosaic and carla client.
         self.carla.close()
