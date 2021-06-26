@@ -391,6 +391,7 @@ class MosaicSimulation(object):
         del self.step_result.remove_actors[:]
         del self.step_result.add_actors[:]
         del self.step_result.traffic_light_updates[:]
+        print("deleting sensor_data")
         del self.step_result.sensor_data[:]
 
         departed_actors = stub.GetDepartedIDList(CarlaLink_pb2.Empty())

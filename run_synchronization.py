@@ -189,6 +189,7 @@ class SimulationSynchronization(object):
         # -----------------
         # mosaic-->carla sync
         # -----------------
+        print('-----')
         self.mosaic.tick()
 
         # Spawning new mosaic actors in carla (i.e, not controlled by carla).
@@ -293,6 +294,9 @@ class SimulationSynchronization(object):
 
                 # Updates all the mosaic links related to this landmark.
                 self.mosaic.synchronize_traffic_light(landmark_id, mosaic_tl_state)
+
+        if len(self.mosaic.step_result.sensor_data) == 0:
+            print('returning self.mosaic.step_result with empty sensor data')
 
         return self.mosaic.step_result
 
