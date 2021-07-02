@@ -15,6 +15,7 @@ Script to integrate CARLA and Eclipse-MOSAIC simulations
 
 import argparse
 import logging
+import copy
 
 from concurrent import futures
 import grpc
@@ -136,38 +137,47 @@ class SimulationSynchronization(object):
     def spawn_sensor(self, sensor):
         if sensor.type_id == 'LiDAR':
             lidar_bp = self.carla.world.get_blueprint_library().find('sensor.lidar.ray_cast')
+
+            for sensor_attribute in sensor.attributes:
+                lidar_bp.set_attribute(sensor_attribute.name, sensor_attribute.value)
             
-            lidar_bp.set_attribute('range', '100')
-            range_attribute = CarlaLink_pb2.Attribute(name='range', value='100')
-            sensor.attributes.append(range_attribute)
+            if 'range' not in sensor.attributes:
+                lidar_bp.set_attribute('range', '100')
+                range_attribute = CarlaLink_pb2.Attribute(name='range', value='100')
+                sensor.attributes.append(range_attribute)
 
-            lidar_bp.set_attribute('dropoff_general_rate', lidar_bp.get_attribute('dropoff_general_rate').recommended_values[0])
-            dropoff_general_rate_attribute = CarlaLink_pb2.Attribute(name='dropoff_general_rate', value=str(lidar_bp.get_attribute('dropoff_general_rate').recommended_values[0]))
-            sensor.attributes.append(dropoff_general_rate_attribute)
+            if 'dropoff_general_rate' not in sensor.attributes:
+                lidar_bp.set_attribute('dropoff_general_rate', lidar_bp.get_attribute('dropoff_general_rate').recommended_values[0])
+                dropoff_general_rate_attribute = CarlaLink_pb2.Attribute(name='dropoff_general_rate', value=str(lidar_bp.get_attribute('dropoff_general_rate').recommended_values[0]))
+                sensor.attributes.append(dropoff_general_rate_attribute)
 
-            lidar_bp.set_attribute('dropoff_intensity_limit', lidar_bp.get_attribute('dropoff_intensity_limit').recommended_values[0])
-            dropoff_intensity_limit_attribute = CarlaLink_pb2.Attribute(name='dropoff_intensity_limit', value=str(lidar_bp.get_attribute('dropoff_intensity_limit').recommended_values[0]))
-            sensor.attributes.append(dropoff_intensity_limit_attribute)
+            if 'dropoff_intensity_limit' not in sensor.attributes:
+                lidar_bp.set_attribute('dropoff_intensity_limit', lidar_bp.get_attribute('dropoff_intensity_limit').recommended_values[0])
+                dropoff_intensity_limit_attribute = CarlaLink_pb2.Attribute(name='dropoff_intensity_limit', value=str(lidar_bp.get_attribute('dropoff_intensity_limit').recommended_values[0]))
+                sensor.attributes.append(dropoff_intensity_limit_attribute)
 
-            lidar_bp.set_attribute('dropoff_zero_intensity', lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0])
-            dropoff_zero_intensity_attribute = CarlaLink_pb2.Attribute(name='dropoff_zero_intensity', value=str(lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0]))
-            sensor.attributes.append(range_attribute)
+            if 'dropoff_zero_intensity' not in sensor.attributes:
+                lidar_bp.set_attribute('dropoff_zero_intensity', lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0])
+                dropoff_zero_intensity_attribute = CarlaLink_pb2.Attribute(name='dropoff_zero_intensity', value=str(lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0]))
+                sensor.attributes.append(dropoff_zero_intensity_attribute)
 
-            # TODO make dynamic for all attributes
-            # for key in sensor_options:
-            #     lidar_bp.set_attribute(key, sensor_options[key])
+            if sensor.location is None:
+                location = carla.Location(0, 0, 2.4)
+            else:
+                location = carla.Location(float(sensor.location.x), float(sensor.location.y), float(sensor.location.z))
 
-            # location = list((float(sensor.location.x), float(sensor.location.y), float(sensor.location.z)))
-            # rotation = [float(sensor.rotation.slope), float(sensor.rotation.angle), 0.0]
-            # transform = carla.Transform(carla.Location(location[0], location[1], location[2]),
-            #                             carla.Rotation(rotation[0], rotation[1], rotation[2]))
+            if sensor.rotation is None:
+                rotation = carla.Rotation(0, 0, 0)
+            else:
+                rotation = carla.Rotation(float(sensor.location.x), float(sensor.location.y), float(sensor.location.z))
 
-            transform = carla.Transform(carla.Location(0, 0, 2.4), carla.Rotation(0, 0, 0)) # TODO
+            transform = carla.Transform(location, rotation)
 
-            # TODO check if id exists inside mosaic2carla_ids. If not try with direct carla_id to support carla sensor spawn
-            to_attach = self.carla.get_actor(self.mosaic2carla_ids[sensor.attached])
-            # to_attach = self.carla.get_actor(int(sensor.attached))
-            # to_attach = self.mosaic.get_actor(sensor.attached)
+            # check if id exists inside mosaic2carla_ids. If not try with direct carla_id to support carla sensor spawn
+            if sensor.attached in self.mosaic2carla_ids:
+                to_attach = self.carla.get_actor(self.mosaic2carla_ids[sensor.attached])
+            else:
+                to_attach = self.carla.get_actor(int(sensor.attached))
 
             lidar = self.carla.world.spawn_actor(lidar_bp, transform, attach_to=to_attach)
 
@@ -338,15 +348,18 @@ class CarlaLinkServiceServicer(CarlaLink_pb2_grpc.CarlaLinkServiceServicer, obje
         self.traffic_lights = dict()
 
     def SimulationStep(self, request, context):
-        # logging.debug("SimulationStep call recieved! Time: ", time.time())
-        step_result = self.sync.tick()
+        logging.debug("SimulationStep call recieved!")
+        # create a deepcopy to delete sensor_data at the end of tick 
+        # to catch sensor_data that gets produced between ticks
+        step_result = copy.deepcopy(self.sync.tick())
+        del self.sync.mosaic.step_result.sensor_data[:]
 
         for actor in self.destroyed_actors:
             self.vehicles.pop(actor.id)
 
         del self.destroyed_actors[:]
         del self.spawned_actors[:]
-
+        print("SimulationStep ended!")
         return step_result
 
     def GetActor(self, request, context):

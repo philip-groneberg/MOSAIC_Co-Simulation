@@ -171,10 +171,7 @@ class CarlaSimulation(object):
         """
         Tick to carla simulation.
         """
-        print("carla tick called!")
         self.world.tick()
-        print("world tick called!")
-
         # Update data structures for the current frame.
         current_actors = set(
             [vehicle.id for vehicle in self.world.get_actors().filter('vehicle.*')])

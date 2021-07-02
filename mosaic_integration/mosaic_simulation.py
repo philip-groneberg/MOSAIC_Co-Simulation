@@ -332,8 +332,8 @@ class MosaicSimulation(object):
         :param sensor_id: ID of the vehicle the sensor is attached to
         :return:
         """
-
-        print("Create sensor data for sensor:", sensor_id, " at ", str(data.timestamp))
+        timestamp = str(data.timestamp)
+        print("Create sensor data for sensor:", sensor_id, "at", timestamp)
 
         # code taken from lidar_to_camera.py example by Carla
         # Get the lidar data and convert it to a numpy array.
@@ -367,7 +367,7 @@ class MosaicSimulation(object):
         world_points_with_offset = world_points_with_offset[:3, :]
 
         sensor_location = CarlaLink_pb2.Location(x = float(data.transform.location.x), y = float(data.transform.location.y), z = float(data.transform.location.z))
-        sensor_data = CarlaLink_pb2.SensorData(id = sensor_id, timestamp = str(data.timestamp), minRange = 0, maxRange = 300, location = sensor_location)
+        sensor_data = CarlaLink_pb2.SensorData(id = sensor_id, timestamp = timestamp, minRange = 0, maxRange = 300, location = sensor_location)
 
         for i, intensity_value in enumerate(intensity):
             # print('Intensity:', intensity_value)
@@ -382,7 +382,6 @@ class MosaicSimulation(object):
         """
         Tick to mosaic simulation.
         """
-        print("mosaic tick called!")
         self.spawned_actors.clear()
         self.destroyed_actors.clear()
         self.traffic_light_ids.clear()
@@ -391,9 +390,7 @@ class MosaicSimulation(object):
         del self.step_result.remove_actors[:]
         del self.step_result.add_actors[:]
         del self.step_result.traffic_light_updates[:]
-        print("deleting sensor_data")
-        del self.step_result.sensor_data[:]
-
+        
         departed_actors = stub.GetDepartedIDList(CarlaLink_pb2.Empty())
         arrived_actors = stub.GetArrivedIDList(CarlaLink_pb2.Empty())
         traffic_lights = stub.GetTrafficLightIDList(CarlaLink_pb2.Empty())
