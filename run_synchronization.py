@@ -139,37 +139,39 @@ class SimulationSynchronization(object):
             lidar_bp = self.carla.world.get_blueprint_library().find('sensor.lidar.ray_cast')
 
             for sensor_attribute in sensor.attributes:
-                lidar_bp.set_attribute(sensor_attribute.name, sensor_attribute.value)
+                lidar_bp.set_attribute(sensor_attribute, sensor.attributes[sensor_attribute])
             
             if 'range' not in sensor.attributes:
                 lidar_bp.set_attribute('range', '100')
-                range_attribute = CarlaLink_pb2.Attribute(name='range', value='100')
-                sensor.attributes.append(range_attribute)
+                sensor.attributes['range'] = '100'
 
             if 'dropoff_general_rate' not in sensor.attributes:
                 lidar_bp.set_attribute('dropoff_general_rate', lidar_bp.get_attribute('dropoff_general_rate').recommended_values[0])
-                dropoff_general_rate_attribute = CarlaLink_pb2.Attribute(name='dropoff_general_rate', value=str(lidar_bp.get_attribute('dropoff_general_rate').recommended_values[0]))
-                sensor.attributes.append(dropoff_general_rate_attribute)
+                sensor.attributes['dropoff_general_rate'] = str(lidar_bp.get_attribute('dropoff_general_rate').recommended_values[0])
 
             if 'dropoff_intensity_limit' not in sensor.attributes:
                 lidar_bp.set_attribute('dropoff_intensity_limit', lidar_bp.get_attribute('dropoff_intensity_limit').recommended_values[0])
-                dropoff_intensity_limit_attribute = CarlaLink_pb2.Attribute(name='dropoff_intensity_limit', value=str(lidar_bp.get_attribute('dropoff_intensity_limit').recommended_values[0]))
-                sensor.attributes.append(dropoff_intensity_limit_attribute)
+                sensor.attributes['dropoff_intensity_limit'] = str(lidar_bp.get_attribute('dropoff_intensity_limit').recommended_values[0])
 
             if 'dropoff_zero_intensity' not in sensor.attributes:
                 lidar_bp.set_attribute('dropoff_zero_intensity', lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0])
-                dropoff_zero_intensity_attribute = CarlaLink_pb2.Attribute(name='dropoff_zero_intensity', value=str(lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0]))
-                sensor.attributes.append(dropoff_zero_intensity_attribute)
+                sensor.attributes['dropoff_zero_intensity'] = str(lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0])
 
-            if sensor.location is None:
+            if sensor.HasField("location"):
+                offset = self.mosaic.get_net_offset()
+                location = carla.Location(float(sensor.location.x) - offset[0], float(sensor.location.y) + offset[1], float(sensor.location.z))
+            else:
                 location = carla.Location(0, 0, 2.4)
-            else:
-                location = carla.Location(float(sensor.location.x), float(sensor.location.y), float(sensor.location.z))
+                sensor.location.x = 0.0
+                sensor.location.y = 0.0
+                sensor.location.z = 2.4
 
-            if sensor.rotation is None:
-                rotation = carla.Rotation(0, 0, 0)
+            if sensor.HasField("rotation"):
+                rotation = carla.Rotation(float(sensor.rotation.slope), float(sensor.rotation.angle), 0)
             else:
-                rotation = carla.Rotation(float(sensor.location.x), float(sensor.location.y), float(sensor.location.z))
+                rotation = carla.Rotation(0, 0, 0)
+                sensor.rotation.slope = 0
+                sensor.rotation.angle = 0
 
             transform = carla.Transform(location, rotation)
 
