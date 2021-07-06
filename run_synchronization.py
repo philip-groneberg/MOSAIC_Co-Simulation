@@ -140,7 +140,8 @@ class SimulationSynchronization(object):
 
             for sensor_attribute in sensor.attributes:
                 lidar_bp.set_attribute(sensor_attribute, sensor.attributes[sensor_attribute])
-            
+                
+            # set standard values if not set by user
             if 'range' not in sensor.attributes:
                 lidar_bp.set_attribute('range', '100')
                 sensor.attributes['range'] = '100'
@@ -158,8 +159,7 @@ class SimulationSynchronization(object):
                 sensor.attributes['dropoff_zero_intensity'] = str(lidar_bp.get_attribute('dropoff_zero_intensity').recommended_values[0])
 
             if sensor.HasField("location"):
-                offset = self.mosaic.get_net_offset()
-                location = carla.Location(float(sensor.location.x) - offset[0], float(sensor.location.y) + offset[1], float(sensor.location.z))
+                location = carla.Location(float(sensor.location.x), float(sensor.location.y), float(sensor.location.z))
             else:
                 location = carla.Location(0, 0, 2.4)
                 sensor.location.x = 0.0
@@ -415,17 +415,14 @@ class CarlaLinkServiceServicer(CarlaLink_pb2_grpc.CarlaLinkServiceServicer, obje
         return CarlaLink_pb2.Empty()
 
     def AddSensor(self, request, context):
-        logging.debug('AddSensor call recieved! ')#, request)
+        logging.debug('AddSensor call recieved! ')
         new_sensor = self.sync.spawn_sensor(request)
-        # self.sensors.update({new_sensor.id: new_sensor})
-        # logging.debug('AddSensor: Sensor added with:', new_sensor)
         return new_sensor
 
     def RemoveSensor(self, request, context):
         logging.debug('RemoveSensor call recieved! id:', request.id)
-        # sensor.stop()
-        # self.sensor.destroy()
-        self.sensors.pop(request.id)
+        self.sync.sensors[request.id].destroy()
+        # self.sync.sensors.pop(request.id)
         return CarlaLink_pb2.Empty()
 
 
