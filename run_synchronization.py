@@ -189,7 +189,7 @@ class SimulationSynchronization(object):
 
             sensor.id = str(lidar.id)
 
-            print(sensor)
+            logging.debug(sensor)
             return sensor
         else:
             return None
@@ -201,7 +201,6 @@ class SimulationSynchronization(object):
         # -----------------
         # mosaic-->carla sync
         # -----------------
-        print('-----')
         self.mosaic.tick()
 
         # Spawning new mosaic actors in carla (i.e, not controlled by carla).
@@ -307,8 +306,8 @@ class SimulationSynchronization(object):
                 # Updates all the mosaic links related to this landmark.
                 self.mosaic.synchronize_traffic_light(landmark_id, mosaic_tl_state)
 
-        if len(self.mosaic.step_result.sensor_data) == 0:
-            print('returning self.mosaic.step_result with empty sensor data')
+        if len(self.sensors) > 0 and len(self.mosaic.step_result.sensor_data) == 0:
+            logging.debug('returning self.mosaic.step_result with empty sensor data')
 
         return self.mosaic.step_result
 
@@ -361,7 +360,7 @@ class CarlaLinkServiceServicer(CarlaLink_pb2_grpc.CarlaLinkServiceServicer, obje
 
         del self.destroyed_actors[:]
         del self.spawned_actors[:]
-        print("SimulationStep ended!")
+        logging.debug("SimulationStep ended!")
         return step_result
 
     def GetActor(self, request, context):

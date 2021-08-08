@@ -333,7 +333,7 @@ class MosaicSimulation(object):
         :return:
         """
         timestamp = str(data.timestamp)
-        print("Create sensor data for sensor:", sensor_id, "at", timestamp)
+        logging.debug("Create sensor data for sensor:", sensor_id, "at", timestamp)
 
         # code taken from lidar_to_camera.py example by Carla
         # Get the lidar data and convert it to a numpy array.
@@ -353,7 +353,6 @@ class MosaicSimulation(object):
         local_lidar_points = np.r_[local_lidar_points, [np.ones(local_lidar_points.shape[1])]]
 
         # This (4, 4) matrix transforms the points from lidar space to world space.
-        # lidar_2_world = self.sensor.get_transform().get_matrix()
         lidar_2_world = data.transform.get_matrix()
         # Transform the points from lidar space to world space.
         world_points = np.dot(lidar_2_world, local_lidar_points)
@@ -370,10 +369,8 @@ class MosaicSimulation(object):
         sensor_data = CarlaLink_pb2.SensorData(id = sensor_id, timestamp = timestamp, minRange = 0, maxRange = 300, location = sensor_location)
 
         for i, intensity_value in enumerate(intensity):
-            # print('Intensity:', intensity_value)
             if intensity_value > 0:
                 lidar_point = CarlaLink_pb2.Location(x = float(world_points_with_offset[0][i]), y = float(world_points_with_offset[1][i]), z = float(world_points_with_offset[2][i]))
-                # print('Recorded LIDAR point:', lidar_point)
                 sensor_data.lidar_points.append(lidar_point)
 
         self.step_result.sensor_data.append(sensor_data)
@@ -403,7 +400,6 @@ class MosaicSimulation(object):
 
         for traffic_light in traffic_lights.traffic_lights:
             self.traffic_light_ids.add(traffic_light.landmark_id)
-
 
     @staticmethod
     def close():
