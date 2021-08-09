@@ -420,7 +420,8 @@ class CarlaLinkServiceServicer(CarlaLink_pb2_grpc.CarlaLinkServiceServicer, obje
 
     def RemoveSensor(self, request, context):
         logging.debug('RemoveSensor call recieved! id:', request.id)
-        self.sync.sensors[request.id].destroy()
+        if request.id in self.sync.sensors:
+            self.sync.sensors[request.id].destroy()
         # self.sync.sensors.pop(request.id)
         return CarlaLink_pb2.Empty()
 
