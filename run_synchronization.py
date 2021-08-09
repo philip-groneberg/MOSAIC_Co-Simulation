@@ -432,7 +432,7 @@ def synchronization_loop(args):
     """
     mosaic_simulation = MosaicSimulation(args.mosaic_cfg_file, args.step_length, args.mosaic_host,
                                          args.mosaic_port, args.mosaic_gui, args.client_order)
-    carla_simulation = CarlaSimulation(args.carla_host, args.carla_port, args.step_length)
+    carla_simulation = CarlaSimulation(args.carla_host, args.carla_port, args.map, args.step_length)
 
     synchronization = SimulationSynchronization(mosaic_simulation, carla_simulation, args.tls_manager,
                                                 args.sync_vehicle_color, args.sync_vehicle_lights)
@@ -500,6 +500,10 @@ if __name__ == '__main__':
                            choices=['none', 'mosaic', 'carla'],
                            help="select traffic light manager (default: none)",
                            default='none')
+    argparser.add_argument('--map',
+                           type=str,
+                           help='map to be loaded',
+                           default='Town03')
     argparser.add_argument('--debug', action='store_true', help='enable debug messages')
     arguments = argparser.parse_args()
 

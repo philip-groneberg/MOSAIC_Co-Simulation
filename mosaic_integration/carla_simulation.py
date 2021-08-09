@@ -26,11 +26,12 @@ class CarlaSimulation(object):
     """
     CarlaSimulation is responsible for the management of the carla simulation.
     """
-    def __init__(self, host, port, step_length):
+    def __init__(self, host, port, carla_map, step_length):
         self.client = carla.Client(host, port)
         self.client.set_timeout(2.0)
 
-        self.world = self.client.get_world()
+        self.world = self.client.load_world(carla_map)
+
         self.blueprint_library = self.world.get_blueprint_library()
         self.step_length = step_length
 
